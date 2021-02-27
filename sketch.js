@@ -1,11 +1,15 @@
 var cols, rows;
-var w = 30;
 var grid = [];
 var current;
 var stack = [];
+var w = 10;
+var framerate = 10;
 
 function setup() {
-  createCanvas(301, 301);
+  var mazeSize = parseInt(document.getElementById("mazeSize").value, 10);
+  console.log(mazeSize);
+  var myCanvas = createCanvas(mazeSize*10, mazeSize*10);
+  myCanvas.parent("canvasContainer");
   
   cols = floor(width/w);
   rows = floor(height/w);
@@ -41,10 +45,10 @@ function draw() {
   }
   else if(stack.length > 0){
     current = stack.pop();
-
   }
-
-  frameRate(15);
+  framerate = parseInt(document.getElementById("mazeFramerate").value, 10);
+  console.log(document.getElementById("mazeFramerate").value, 10);
+  frameRate(framerate);
 }
 function index(i, j) {
   //bounds checking 
@@ -122,6 +126,9 @@ function Cell(i, j) {
     fill(255, 255, 255);
     rect(x, y, w, w);
     }
+    stroke(0);
+    noFill();
+    rect(0,0,cols*w, rows*w);
   }
 
 }
