@@ -6,8 +6,9 @@ var w = 10;
 var framerate = 10;
 
 function setup() {
-  var mazeSize = parseInt(document.getElementById("mazeSize").value, 10);
-  console.log(mazeSize);
+  document.getElementById('mazeSize').value = getSavedValue("mazeSize");
+  var mazeSize = getSavedValue("mazeSize");
+
   var myCanvas = createCanvas(mazeSize*10, mazeSize*10);
   myCanvas.parent("canvasContainer");
   
@@ -47,6 +48,9 @@ function draw() {
     current = stack.pop();
   }
   framerate = parseInt(document.getElementById("mazeFramerate").value, 10);
+  if(!framerate){
+    framerate = 1;
+  }
   console.log(document.getElementById("mazeFramerate").value, 10);
   frameRate(framerate);
 }
@@ -170,4 +174,20 @@ function download_image(){
   link.download = "my-image.png";
   link.href = image;
   link.click();
+}
+//function to save user inputs for the refresh
+function saveValue(x){
+  console.log("value saved");
+  var id = x.id;
+  var val = x.value;
+  localStorage.setItem(id, val);
+  console.log(localStorage);
+}
+//function to get saved input value
+function getSavedValue(x){
+  console.log(localStorage);
+  if(!localStorage.getItem(x)){
+    return 10;
+  }
+  return localStorage.getItem(x);
 }
