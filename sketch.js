@@ -2,172 +2,146 @@ var cols, rows;
 var grid = [];
 var current;
 var stack = [];
-var w = 10;
+var w = 40;
 var framerate = 10;
+var currentMov;
+var finished = false;
+var preMov;
+var mazeSize;
+var alertShown = false;
 
 function setup() {
   document.getElementById('mazeSize').value = getSavedValue("mazeSize");
-  var mazeSize = getSavedValue("mazeSize");
+  mazeSize = getSavedValue("mazeSize");
+  document.getElementById('mazeFramerate').value = getSavedValue("mazeFramerate");
 
-  var myCanvas = createCanvas(mazeSize*10, mazeSize*10);
+  var myCanvas = createCanvas(mazeSize * 40, mazeSize * 40);
   myCanvas.parent("canvasContainer");
-  
-  cols = floor(width/w);
-  rows = floor(height/w);
- 
-  for(var j = 0; j < rows; j++) {
-    for(var i = 0; i < cols; i++) {
+
+  cols = floor(width / w);//round to int
+  rows = floor(height / w);
+
+  for (var j = 0; j < rows; j++) {
+    for (var i = 0; i < cols; i++) {
       var cell = new Cell(i, j);
       grid.push(cell);
     }
   }
   current = grid[0];
+  currentMov = grid[0];
+}//Setup 
 
-}
 function draw() {
-  background(51);
+  if (finished == false) {
+    background(51);
+    for (var i = 0; i < grid.length; i++) { grid[i].show(); }
 
-  for (var i = 0; i < grid.length; i++) {
-    grid[i].show();       
+    current.visited = true;      //step 1
+    current.highlight(true);
+    markEnd();
+    var next = current.checkNeighbors();
+    if (next) {
+      next.visited = true;       //step 2
+      stack.push(current);       //step 3
+      removeWalls(current, next);//step 4
+      current = next;
+    }
+    else if (stack.length > 0) { current = stack.pop(); }
+
+    if (stack.length == 0) {
+      document.getElementById("solveButton").removeAttribute("disabled");
+      currentMov = current;
+    }
+    else {
+      document.getElementById("solveButton").setAttribute("disabled", true);
+    }
+  }//finished
+
+  document.addEventListener("keydown", function (event) {
+    if (event.defaultPrevented) { return; }
+    preMov = currentMov;
+    switch (event.key) {
+      case "ArrowDown":
+        if (!preMov.walls[2]) {
+          currentMov = grid[index(currentMov.i, currentMov.j) + parseInt(mazeSize)];
+          currentMov.highlight(true);
+          preMov.highlight(false);
+        }
+        break;
+      case "ArrowUp":
+        if (!preMov.walls[0]) {
+          currentMov = grid[index(currentMov.i, currentMov.j) - parseInt(mazeSize)];
+          currentMov.highlight(true);
+          preMov.highlight(false);
+        }
+        break;
+      case "ArrowLeft":
+        if (!preMov.walls[3]) {
+          currentMov = grid[index(currentMov.i, currentMov.j) - 1];
+          currentMov.highlight(true);
+          preMov.highlight(false);
+        }
+        break;
+      case "ArrowRight":
+        if (!preMov.walls[1]) {
+          currentMov = grid[index(currentMov.i, currentMov.j) + 1];
+          currentMov.highlight(true);
+          preMov.highlight(false);
+        }
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+  }, true);
+  if (index(currentMov.i, currentMov.j) == (parseInt(mazeSize) * parseInt(mazeSize)) - 1 && alertShown == false){
+    alert("Labyrinth conquered, Theseus evades the Minotaur");
+    alertShown = true;
   }
-  current.visited = true;
-  current.highlight();
-  markEnd();
-  //step 1
-  var next = current.checkNeighbors();
-  if(next) {
-    next.visited = true;
-    //step 2
-    stack.push(current);
-    //step 3
-    removeWalls(current, next);
-  //step 4
-    current = next;
-  }
-  else if(stack.length > 0){
-    current = stack.pop();
-  }
+
   framerate = parseInt(document.getElementById("mazeFramerate").value, 10);
-  if(!framerate){
+  saveValue(document.getElementById('mazeFramerate'));
+  if (!framerate) {
     framerate = 1;
   }
-  console.log(document.getElementById("mazeFramerate").value, 10);
   frameRate(framerate);
-}
-function index(i, j) {
-  //bounds checking 
-  if ( i < 0 || j < 0 || i > cols-1 || j > rows-1) {
-    return -1;
-  }
-  return i + j * cols;
+}//Draw 
+
+function index(i, j) {  //bounds checking 
+  if (i < 0 || j < 0 || i > cols - 1 || j > rows - 1) { return -1; }
+  else { return i + j * cols;} //index fomula
 }
 
-function Cell(i, j) {
-  this.i = i;
-  this.j = j;
-  this.walls = [true, true, true, true];// top, right,bottom, left
-  this.visited = false;
-
-  this.checkNeighbors = function() {
-    var neighbors = [];
-
-    var top    = grid[index(i    , j - 1)];
-    var right  = grid[index(i + 1, j)];
-    var bottom = grid[index(i    , j + 1)];
-    var left   = grid[index(i - 1, j)];
-
-    if (top && !top.visited) {
-      neighbors.push(top);
-    }
-    if (right && !right.visited) {
-      neighbors.push(right);
-    }
-    if (bottom && !bottom.visited) {
-      neighbors.push(bottom);
-    }
-    if (left && !left.visited) {
-      neighbors.push(left);
-    }
-
-    if( neighbors.length > 0) {
-      var r = floor(random(0, neighbors.length));
-      return neighbors[r];  
-    }
-    else{
-      return undefined;
-    }
-
-  }
-
-  this.highlight = function() {
-    var x = this.i * w;
-    var y = this.j * w;
-    fill(0, 0, 255, 100);
-    rect(x, y, w, w);
-    noStroke();
-  }
-
-  this.show = function() {
-
-    var x = this.i * w;
-    var y = this.j * w;
-    stroke('black');
-   
-    if(this.walls[0]){
-      line(x    , y    , x + w, y);
-    }
-    if(this.walls[1]){
-      line(x + w, y    , x + w, y + w);
-    }
-    if(this.walls[2]){
-      line(x + w, y + w, x    , y + w);
-    }
-    if(this.walls[3]){
-      line(x    , y + w, x    , y);
-    }
-    if (this.visited) {
-    noStroke();
-    fill(255, 255, 255);
-    rect(x, y, w, w);
-    }
-    stroke(0);
-    noFill();
-    rect(0,0,cols*w, rows*w);
-  }
-
-}
-
-function removeWalls(a, b){
-
+function removeWalls(a, b) {
   var x = a.i - b.i;
-  if(x === 1) {
+  if (x === 1) {
     a.walls[3] = false;
     b.walls[1] = false;
   }
-  else if( x === -1){
+  else if (x === -1) {
     a.walls[1] = false;
     b.walls[3] = false;
   }
   var y = a.j - b.j;
-  if(y === 1) {
+  if (y === 1) {
     a.walls[0] = false;
     b.walls[2] = false;
   }
-  else if( y === -1){
+  else if (y === -1) {
     a.walls[2] = false;
     b.walls[0] = false;
   }
-
 }
-function markEnd(){
-  var x = (cols * w)-w;
-  var y =  (rows * w)-w;
-  fill(255,69,0);
-  rect(x, y, w, w);
+
+function markEnd() {
+  var x = (cols * w) - w;
+  var y = (rows * w) - w;
+  fill(255, 69, 0);
+  rect(x+w/4, y+w/4, w/2, w/2);
   noStroke();
 }
 
-function download_image(){
+function download_image() {
   var canvas = document.getElementById("defaultCanvas0");
   image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
   var link = document.createElement('a');
@@ -175,19 +149,18 @@ function download_image(){
   link.href = image;
   link.click();
 }
-//function to save user inputs for the refresh
-function saveValue(x){
-  console.log("value saved");
+
+function saveValue(x) {//function to save user inputs for the refresh
   var id = x.id;
   var val = x.value;
   localStorage.setItem(id, val);
-  console.log(localStorage);
 }
-//function to get saved input value
-function getSavedValue(x){
-  console.log(localStorage);
-  if(!localStorage.getItem(x)){
-    return 10;
-  }
-  return localStorage.getItem(x);
+
+function getSavedValue(x) {//function to get saved input value
+  if (!localStorage.getItem(x)) { return 10; }
+  else {  return localStorage.getItem(x); }
+}
+
+function solveVar() {
+  finished = true;
 }

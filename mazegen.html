@@ -10,6 +10,7 @@
 
     <script src="libraries/p5.min.js"></script>
     <script src="libraries/p5.sound.min.js"></script>
+    <script src="Cell.js"></script>
     <script src="sketch.js"></script>
   </head>
 
@@ -19,14 +20,18 @@
     <label for="mazeSize">Maze Size:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
     <input type="text" placeholder="20" id='mazeSize'> Recommended(1 < maze size < 200)<br><br>
     <label for="mazeFramerate">Maze Framerate: </label>
-    <input type="text" placeholder="10" value="5" id="mazeFramerate"><br><br>
+    <input type="text" placeholder="10" id="mazeFramerate"><br><br>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <button onClick="saveValue(document.getElementById('mazeSize')); window.location.reload();">Start</button><br><br>
+    <button onClick="saveValue(document.getElementById('mazeSize'));saveValue(document.getElementById('mazeFramerate')); window.location.reload();">Start</button><br><br>
   </div>
   <div id="canvasContainer" style ="display: flex; justify-content: center;"></div><br>
   <div id="download" style ="display: flex; justify-content: center;">
+  <div id="download" style ="display: flex; justify-content: center;">
     <button onclick="download_image()">Download</button>
+  </div>
+  <div id="solve" style ="display: flex; justify-content: center;">
+    <button id = "solveButton" onclick="solveVar();"  disabled >Solve</button>
   </div>
   </body>
 </html>
