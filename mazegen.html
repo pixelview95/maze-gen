@@ -17,13 +17,17 @@
   <body>
   <div id="userControl"> 
     <br>
-    <label for="mazeSize">Maze Size:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-    <input type="text" placeholder="20" id='mazeSize'> Recommended(1 < maze size < 200)<br><br>
-    <label for="mazeFramerate">Maze Framerate: </label>
-    <input type="text" placeholder="10" id="mazeFramerate"><br><br>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <button onClick="saveValue(document.getElementById('mazeSize'));saveValue(document.getElementById('mazeFramerate')); window.location.reload();">Start</button><br><br>
+    <form oninput="rangeOutput.value = cellSize.value">
+      <label for="cellSize"><b>Cell Size:</b></label>
+      <input type="range"  id="cellSize" min="1" max="100">
+      <output id="rangeOutput" for="cellSize"> </output><br><br>
+    </form>   
+    <label for="mazeSize"><b>Maze Size:</b></label>
+    <input type="text" placeholder="20" id='mazeSize' size="2"> Recommended(1 < maze size < 200)<br><br>
+    <label for="mazeFramerate"><b>Maze Framerate:</b></label>
+    <input type="text" placeholder="10" id="mazeFramerate" size="2"><br><br>
+    <button onClick="saveValue(document.getElementById('mazeSize'));saveValue(document.getElementById('mazeFramerate'));
+    saveValue(document.getElementById('cellSize')); window.location.reload();">Generate</button><br>
   </div>
   <div id="canvasContainer" style ="display: flex; justify-content: center;"></div><br>
   <div id="download" style ="display: flex; justify-content: center;">
@@ -31,7 +35,7 @@
     <button onclick="download_image()">Download</button>
   </div>
   <div id="solve" style ="display: flex; justify-content: center;">
-    <button id = "solveButton" onclick="solveVar();"  disabled >Solve</button>
+    <button id = "solveButton" onclick="solveVar();"  style="background-color: greenyellow;" disabled>Solve</button>
   </div>
   </body>
 </html>

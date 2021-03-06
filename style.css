@@ -1,11 +1,23 @@
 html, body {
   margin: 0;
   padding: 0;
+  background-image: url(../images/background.png);
+}
+#userControl{
+  overflow: hidden;
+  color: black;
+  background-color: rgb(227, 225, 249);
+  margin-left: 2vw;
+  margin-right: 2vw;
+  background-clip: border-box;
+  margin-bottom: 1vh;
+  margin-top: 0.5vh;
+  padding: 1vh;
+  border-radius: 1vh;
+  font-family: 'Courier New', Courier, monospace;
 }
 canvas {
   display: block;
-
-
 }
 
 

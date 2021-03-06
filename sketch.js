@@ -11,11 +11,16 @@ var mazeSize;
 var alertShown = false;
 
 function setup() {
+  document.getElementById('cellSize').value = getSavedValue("cellSize");
+  w = getSavedValue("cellSize");
   document.getElementById('mazeSize').value = getSavedValue("mazeSize");
   mazeSize = getSavedValue("mazeSize");
   document.getElementById('mazeFramerate').value = getSavedValue("mazeFramerate");
+  //set default slider output value
+  document.getElementById('rangeOutput').value = getSavedValue("cellSize");
 
-  var myCanvas = createCanvas(mazeSize * 40, mazeSize * 40);
+
+  var myCanvas = createCanvas(mazeSize * w, mazeSize * w);
   myCanvas.parent("canvasContainer");
 
   cols = floor(width / w);//round to int
@@ -92,13 +97,14 @@ function draw() {
       default:
         return;
     }
-    event.preventDefault();
+   event.preventDefault();
   }, true);
+
   if (index(currentMov.i, currentMov.j) == (parseInt(mazeSize) * parseInt(mazeSize)) - 1 && alertShown == false){
     alert("Labyrinth conquered, Theseus evades the Minotaur");
     alertShown = true;
   }
-
+  w = parseInt(document.getElementById("cellSize").value, 10);
   framerate = parseInt(document.getElementById("mazeFramerate").value, 10);
   saveValue(document.getElementById('mazeFramerate'));
   if (!framerate) {
